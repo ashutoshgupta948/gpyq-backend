@@ -3,7 +3,9 @@ const bodyParser = require('body-parser');
 const mysql = require('mysql');
 const cors = require('cors');
 const app = express();
-const PORT = 8081;
+// const PORT = 8081;
+const PORT = process.env.PORT || 8081;
+
 
 // Adding the next 3 lines of the code to support image upload for the questions
 const multer = require("multer");
