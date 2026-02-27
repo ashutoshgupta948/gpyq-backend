@@ -30,13 +30,24 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/ques_photos", express.static("D:/gpyq/ques_photos"));
 
 
-// Create a connection to the MySQL database
+// Create a connection to the local MySQL database
+// const con = mysql.createConnection({
+//     host: 'localhost',
+//     user: 'root',
+//     password: '',
+//     database: 'gpyq'
+// });
+
+
 const con = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'gpyq'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT
 });
+
+
 // Connect to the MySQL database
 con.connect((err) => {
     if (err) {
