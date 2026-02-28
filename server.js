@@ -13,19 +13,51 @@ const path = require("path");
 const fs = require("fs");
 
 // Define CORS options
-const corsOptions = {
-    origin: 'http://localhost:3000',  // Allow only the frontend origin
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  // Specify allowed methods
-    allowedHeaders: ['Content-Type', 'Authorization'],  // Specify allowed headers
-    credentials: true,  // Allow cookies and credentials
-    optionsSuccessStatus: 200  // Return a successful status for OPTIONS requests
-};
-//app.use(cors(corsOptions));
-// Middleware to handle OPTIONS preflight requests for all routes
-app.options('*', cors(corsOptions));
+// const corsOptions = {
+//     origin: 'http://localhost:3000',  // Allow only the frontend origin
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  // Specify allowed methods
+//     allowedHeaders: ['Content-Type', 'Authorization'],  // Specify allowed headers
+//     credentials: true,  // Allow cookies and credentials
+//     optionsSuccessStatus: 200  // Return a successful status for OPTIONS requests
+// };
+// //app.use(cors(corsOptions));
+// // Middleware to handle OPTIONS preflight requests for all routes
+// app.options('*', cors(corsOptions));
 // Use body-parser to parse request bodies
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// Middleware to add CORS headers to all responses (if not using the cors library)
+// app.use((req, res, next) => {
+//     res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+//     res.header("Access-Control-Allow-Credentials", "true");
+//     next();
+// });
+
+
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://gpyq-frontend.onrender.com"
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
+
+
+
+
 
 app.use("/ques_photos", express.static("D:/gpyq/ques_photos"));
 
@@ -56,43 +88,6 @@ con.connect((err) => {
     }
     console.log('Connected to the MySQL database.');
 });
-// Middleware to add CORS headers to all responses (if not using the cors library)
-// app.use((req, res, next) => {
-//     res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-//     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-//     res.header("Access-Control-Allow-Credentials", "true");
-//     next();
-// });
-
-
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://gpyq-frontend.onrender.com"
-];
-
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-
-  if (allowedOrigins.includes(origin)) {
-    res.header("Access-Control-Allow-Origin", origin);
-  }
-
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS"
-  );
-
-  res.header("Access-Control-Allow-Credentials", "true");
-
-  next();
-});
-
 
 app.get("/questions", (req, res) => {
     const { topic, subject, year } = req.query;
